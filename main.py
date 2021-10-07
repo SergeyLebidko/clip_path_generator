@@ -63,9 +63,6 @@ def get_polygon_data(field):
                 y2 = (row + 1) * CELL_SIZE
                 segments_set.add(((x1, y1), (x2, y2)))
 
-    # TODO Тестовый код. В дальнейшем - удалить
-    # print('Количество сегментов:', len(segments_set), '\n')
-
     # Этап второй - Упорядочивание множества отрезков в единый список точек
     segments_list = list(segments_set)
     point_a, point_b = segments_list.pop()
@@ -119,12 +116,6 @@ def get_polygon_data(field):
 def main():
     result = []
     for field in field_gen():
-        # TODO Тестовый код. В дальнейшем - удалить
-        # for r in range(ROW_COUNT):
-        #     for c in range(COL_COUNT):
-        #         print('X' if field[(r, c)] else '.', end='')
-        #     print()
-
         polygon_data = get_polygon_data(field)
         result.append(polygon_data)
 
