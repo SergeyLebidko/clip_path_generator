@@ -11,7 +11,14 @@ def field_gen():
             key = (r, c)
             field[key] = True
 
-    # TODO Код генерирования очередного состояния поля
+    yield field
+
+    for s in range(0, COL_COUNT + ROW_COUNT - 2):
+        for r in range(ROW_COUNT):
+            for c in range(COL_COUNT):
+                field[(r, c)] = (r + c) > s
+
+        yield field
 
 
 def get_polygon_data(field):
@@ -22,6 +29,14 @@ def get_polygon_data(field):
 def main():
     result = []
     for field in field_gen():
+
+        for r in range(ROW_COUNT):
+            for c in range(COL_COUNT):
+                print('X' if field[(r, c)] else '.', end='')
+            print()
+
+        print()
+
         polygon_data = get_polygon_data(field)
         result.append(polygon_data)
 
