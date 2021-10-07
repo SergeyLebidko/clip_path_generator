@@ -1,3 +1,5 @@
+import json
+
 ROW_COUNT = 25
 COL_COUNT = 25
 
@@ -22,7 +24,7 @@ def field_gen():
 
 
 def get_polygon_data(field):
-    # Формирование списка отрезков
+    # Этап первый - Формирование множества отрезков
     segments_set = set()
     for row in range(ROW_COUNT):
         for col in range(COL_COUNT):
@@ -64,13 +66,59 @@ def get_polygon_data(field):
     # TODO Тестовый код. В дальнейшем - удалить
     # print('Количество сегментов:', len(segments_set), '\n')
 
-    return []
+    # Этап второй - Упорядочивание множества отрезков в единый список точек
+    segments_list = list(segments_set)
+    point_a, point_b = segments_list.pop()
+    point_list = [point_a, point_b]
+
+    # Пока еще есть отрезки в исходном списке отрезков, продолжаем...
+    while segments_list:
+        next_segments_list = []
+
+        for point_1, point_2 in segments_list:
+            point_a, point_b = point_list[0], point_list[-1]
+
+            if point_a == point_1:
+                point_list = [point_2, *point_list]
+                continue
+
+            if point_a == point_2:
+                point_list = [point_1, *point_list]
+                continue
+
+            if point_b == point_1:
+                point_list = [*point_list, point_2]
+                continue
+
+            if point_b == point_2:
+                point_list = [*point_list, point_1]
+                continue
+
+            next_segments_list.append((point_1, point_2))
+
+        segments_list = next_segments_list
+
+    # Усекаем последнюю - дублирующую - точку
+    point_list = point_list[:-1]
+
+    # Оптимизируем список точек, удаляя лишние точки
+    tmp_point_list = []
+    for index in range(len(point_list)):
+        prev_index = index - 1 if index > 0 else len(point_list) - 1
+        next_index = index + 1 if index < (len(point_list) - 1) else 0
+        x1, y1 = point_list[prev_index]
+        x2, y2 = point_list[next_index]
+        dx, dy = x1 - x2, y1 - y2
+        tmp_point_list.append((point_list[index], dx != 0 and dy != 0))
+
+    point_list = [(value[0][0], value[0][1]) for value in filter(lambda value: value[1], tmp_point_list)]
+
+    return point_list
 
 
 def main():
     result = []
     for field in field_gen():
-
         # TODO Тестовый код. В дальнейшем - удалить
         # for r in range(ROW_COUNT):
         #     for c in range(COL_COUNT):
@@ -80,7 +128,8 @@ def main():
         polygon_data = get_polygon_data(field)
         result.append(polygon_data)
 
-    # TODO Код записи на диск выходного JSON-файла
+    with open('pattern.json', 'wt') as file:
+        file.write(json.dumps(result))
 
 
 if __name__ == '__main__':
