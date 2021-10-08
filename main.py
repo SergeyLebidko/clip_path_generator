@@ -131,13 +131,23 @@ def get_polygon_data(field):
 
 
 def main():
-    result = []
+    left_list = []
     for field in to_left_field_gen():
         polygon_data = get_polygon_data(field)
-        result.append(polygon_data)
+        left_list.append(polygon_data)
+
+    right_list = []
+    for field in to_right_field_gen():
+        polygon_data = get_polygon_data(field)
+        right_list.append(polygon_data)
+
+    result = {
+        'to_left': left_list,
+        'to_right': right_list
+    }
 
     with open('pattern.json', 'wt') as file:
-        file.write(json.dumps(result))
+        file.write(json.dumps(result, indent=2, sort_keys=False, ensure_ascii=False))
 
 
 if __name__ == '__main__':
