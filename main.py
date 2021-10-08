@@ -6,19 +6,36 @@ COL_COUNT = 25
 CELL_SIZE = 4
 
 
-def field_gen():
+def create_new_field():
     field = {}
     for row in range(ROW_COUNT):
         for col in range(COL_COUNT):
             key = (row, col)
             field[key] = True
 
+    return field
+
+
+def to_right_field_gen():
+    field = create_new_field()
     yield field
 
     for sum_limit in range(0, COL_COUNT + ROW_COUNT - 2):
         for row in range(ROW_COUNT):
             for col in range(COL_COUNT):
                 field[(row, col)] = (row + col) > sum_limit
+
+        yield field
+
+
+def to_left_field_gen():
+    field = create_new_field()
+    yield field
+
+    for sum_limit in range(COL_COUNT + ROW_COUNT - 2, 0, -1):
+        for row in range(ROW_COUNT):
+            for col in range(COL_COUNT):
+                field[(row, col)] = (row + col) < sum_limit
 
         yield field
 
@@ -115,7 +132,7 @@ def get_polygon_data(field):
 
 def main():
     result = []
-    for field in field_gen():
+    for field in to_left_field_gen():
         polygon_data = get_polygon_data(field)
         result.append(polygon_data)
 
